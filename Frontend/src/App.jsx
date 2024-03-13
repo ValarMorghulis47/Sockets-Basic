@@ -19,14 +19,18 @@ function App() {
   };
 
   const handlePrivateSubmit = () => {
-    socket.emit('private-message', { message: privateMessage, recipient });
+    const messageData = { message: privateMessage, recipient };
+    socket.emit('private-message', messageData);
+    setPrivateMessages((messages) => [...messages, messageData]);
     setPrivateMessage('');
     setRecipient('');
   };
 
   const handleGroupSubmit = () => {
     if (groupToSend) {
-      socket.emit('group-message', { message: messages, group: groupToSend });
+      const messageData = { message: messages, group: groupToSend };
+      socket.emit('group-message', messageData);
+      setGroupMessages((messages) => [...messages, messageData]);
       setMessages('');
       setGroupToSend('');
     } else {
@@ -46,11 +50,11 @@ function App() {
 
   useEffect(() => {
     const handleReceiveMessage = (data) => {
-        if (data.type === 'private') {
-          setPrivateMessages((messages) => [...messages, data]);
-        } else if (data.type === 'group') {
-          setGroupMessages((messages) => [...messages, data]);
-        }
+      if (data.type === 'private') {
+        setPrivateMessages((messages) => [...messages, data]);
+      } else if (data.type === 'group') {
+        setGroupMessages((messages) => [...messages, data]);
+      }
     };
 
     socket.on('connect', () => {
